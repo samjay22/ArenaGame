@@ -1,7 +1,7 @@
 --!strict
 local InsertService : InsertService = game:GetService("InsertService")
 
-local IdentifiableClass = require(script.Parent.IdentifiableClass)
+local IdentifiableClass = require(game.ReplicatedStorage.Classes.Identifiable)
 
 -- Class implementing CharacterAsset
 local CharacterAssetClass = {}
