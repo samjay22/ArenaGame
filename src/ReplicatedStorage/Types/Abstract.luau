@@ -2,7 +2,7 @@
 
 -- Identifiable interface
 export type Identifiable = {
-    SystemId: string | number,
+    GetSystemId : () -> string | number,
 }
 
 -- Generic collection interface
