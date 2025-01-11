@@ -10,21 +10,28 @@ export type PlayerInventory = {
 & Abstract.Identifiable
 & Abstract.IDisposable
 
-export type CharacterMetadata = {
-    ActiveAbilities : listOf<number>,
-    PassiveAbilities : listOf<number>,
-    UltimateAbility : number,
 
+--Character structs
+export type CharacterAsset = {
+    RobloxAssetId : number,
+    PrefabInstance : Instance?
+} & Abstract.ILoadable
+& Abstract.Identifiable
+
+
+export type CharacterStats = {
     --Insert service can import this asset
     Name : string,
-    RobloxAssetId : number,
     Stats : {
         [string] : any
     }
     
-} & Abstract.ICloneable 
-& Abstract.IComparable 
-& Abstract.Identifiable
-& Abstract.IDisposable
+}& Abstract.Identifiable
+
+export type CharacterAbilitiyStats = {
+    ActiveAbilities : listOf<number>,
+    PassiveAbilities : listOf<number>,
+    UltimateAbility : number,
+} & Abstract.Identifiable
 
 return 0
