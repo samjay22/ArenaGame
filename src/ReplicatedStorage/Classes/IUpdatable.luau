@@ -1,19 +1,13 @@
 --!strict
 
--- Interface for updatable entities
-type IUpdatable = {
-    Update: (self: IUpdatable, dt: number) -> (),
-}
-
 -- Class implementing IUpdatable
 local Updatable = {}
 Updatable.__index = Updatable
 
 export type Updatable = IUpdatable & typeof(Updatable)
 
-function Updatable.new(updateMethod : (self, dt : number) -> ()): Updatable
+function Updatable.new(): Updatable
     local self: Updatable = setmetatable({}, Updatable)
-    self.Update = updateMethod
     return self
 end
 
