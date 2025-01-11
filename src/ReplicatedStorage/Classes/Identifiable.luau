@@ -1,0 +1,20 @@
+--!strict
+
+-- Identifiable interface
+export type Identifiable = {
+    SystemId: string | number,
+}
+
+-- Class implementing Identifiable
+local IdentifiableClass = {}
+IdentifiableClass.__index = IdentifiableClass
+
+export type IdentifiableClass = Identifiable & typeof(IdentifiableClass)
+
+function IdentifiableClass.new(systemId: string | number): IdentifiableClass
+    local self: IdentifiableClass = setmetatable({}, IdentifiableClass)
+    self.SystemId = systemId
+    return self
+end
+
+return IdentifiableClass
