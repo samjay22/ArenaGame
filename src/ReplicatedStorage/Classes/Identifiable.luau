@@ -1,7 +1,7 @@
 --!strict
 
 -- Identifiable interface
-export type Identifiable = {
+type Identifiable = {
     SystemId: string | number,
 }
 
@@ -15,6 +15,10 @@ function IdentifiableClass.new(systemId: string | number): IdentifiableClass
     local self: IdentifiableClass = setmetatable({}, IdentifiableClass)
     self.SystemId = systemId
     return self
+end
+
+function IdentifiableClass:GetSystemId()
+    return self.SystemId
 end
 
 return IdentifiableClass
