@@ -10,35 +10,17 @@ type IGetMethods = {
     GetEntityFromId : <E>(id : number) -> E   
 }
 
---Interface for data(inventory, stats, ect...)
-type IDataService<T> = IBaseService<{
-    LoadData : (player : Player) -> (),
-    SaveData : (player : Player) -> (),
-    UpdateData : (player : Player) -> (),
-}> & T & IGetMethods
 
---Interface for Asset based Services
-type IMetadataService<T> = {
-    UpdateEntityMetadataById : (id : number | string) -> (),
-} & T & IGetMethods & Abstract.ILoadable
 
 --For Player
-export type InventoryService = IDataService<{
-
-}>
-
-export type StatsService = IDataService<{
-
-}>
+type DataService<T> = IBaseService<T> & IGetMethods
+export type InventoryService = IBaseService<{}>
+export type StatsService = IBaseService<{}>
 
 --- services for dealing with in game assets
-export type CharacterMetadataService = IMetadataService<{
-
-}>
-
-export type AbilityMetadataService = IMetadataService<{
-
-}>
+type IMetadataService<T> = IBaseService<T> & IGetMethods
+export type CharacterMetadataService = IMetadataService<{}>
+export type AbilityMetadataService = IMetadataService<{}>
 
 
 
