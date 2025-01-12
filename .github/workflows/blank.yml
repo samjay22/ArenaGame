@@ -24,7 +24,7 @@ jobs:
 
       - name: Install Luau Type Checker
         run: |
-          curl -L https://github.com/Roblox/luau/releases/download/0.543/luau-linux.tar.gz | tar xz
+          curl -L https://github.com/luau-lang/luau/archive/refs/heads/master.zip | tar xz
           sudo mv luau /usr/local/bin/luau-analyze
 
       - name: Run Luau Type Checker
