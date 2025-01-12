@@ -32,7 +32,9 @@ jobs:
             # Directory to run the build in
             working-directory: .
             
-
+      - name: Verify Output File
+        run: ls -la
+        
       - name: Upload to Roblox
         uses: Ulferno/upload-to-roblox@v1.0.4
         with:
