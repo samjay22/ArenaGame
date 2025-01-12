@@ -1,0 +1,68 @@
+name: Deploy to Roblox
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which environment to deploy to (dev, stage, prod)'
+        required: true
+        default: 'dev'
+
+  push:
+    branches:
+      - 'Prod'
+      - 'Stage'
+      - 'Dev'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Set the environment based on input or branch name
+    environment: ${{ github.event.inputs.environment || 
+        (github.ref == 'refs/heads/Prod' && 'Prod') || 
+        (github.ref == 'refs/heads/Stage' && 'Stage') || 
+        (github.ref == 'refs/heads/Dev' && 'Dev') || 
+        'Dev' }}
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Rojo
+      run: |
+        curl -L https://github.com/rojo-rbx/rojo/releases/download/7.3.0/rojo-7.3.0-linux-x86_64.tar.gz | tar xz
+        sudo mv rojo /usr/local/bin/
+
+    - name: Install Luau Type Checker
+      run: |
+        curl -L https://github.com/Roblox/luau/releases/download/0.543/luau-linux.tar.gz | tar xz
+        sudo mv luau /usr/local/bin/luau-analyze
+
+    - name: Run Luau Type Checker
+      run: |
+        luau-analyze .
+      continue-on-error: false
+
+    - name: Build Roblox Place File
+      run: |
+        rojo build -o place.rbxlx
+
+    - name: Deploy to Roblox
+      env:
+        ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+        ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_PLACE_ID }}
+      run: |
+        RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
+          -H "x-api-key: $ROBLOX_API_KEY" \
+          -F "file=@place.rbxlx" \
+          "https://apis.roblox.com/universes/v1/places/$ROBLOX_PLACE_ID/versions?versionType=Published")
+
+        if [ "$RESPONSE" -ne 200 ]; then
+          echo "Failed to upload place file"
+          cat response.json
+          exit 1
+        else
+          echo "Place uploaded successfully"
+          cat response.json
+        fi
