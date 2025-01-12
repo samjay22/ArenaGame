@@ -5,12 +5,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ControlledExecution = require(ReplicatedStorage.Utilities.ControlledExecution)
 
 local abilityCache = {}
+local awaitingSuspensions = {}
 local executionCache = {}
 
 local Abilities = {}
 
 -- Abilities
-function Abilities.load(folder: Instance)
+function Abilities.load(folder: Instance) -- Prob not gonna use this, use define instead! LOL. LMAOOO!
     for _, Module in next, folder:GetDescendants() do
         if not Module:IsA("ModuleScript") then
             continue
@@ -33,8 +34,9 @@ function Abilities.execute(player: Player, attackName: string, skipTime: number?
     local controlledExecution = ControlledExecution.createExecution(coroutine.create(execution))
     local guid = HttpService:GenerateGUID(false)
     executionCache[guid] = controlledExecution
+    controlledExecution._guid = guid
 
-    return function(...)
+    return controlledExecution, function(...)
         controlledExecution.execute(skipTime, ...)
         executionCache[guid] = nil
 
@@ -51,5 +53,48 @@ function Abilities.cancel(guid: string)
 
 end
 
+function Abilities.replicateInformation(guid: string, data: {})
+    local controlledExecution = executionCache[guid]
+    assert(controlledExecution, `No controlled execution for {guid}`)
 
-return abilityCache
+    for k, v in next, data do
+        controlledExecution.communicated[k] = v
+    end
+
+    local thread = awaitingSuspensions[guid]
+    if thread then
+        coroutine.resume(thread)
+    end
+
+end
+
+function Abilities.define(execution: (player: Player, state: ControlledExecution.Execution, ...any)->())
+    return function(name: string)
+        abilityCache[name] = execution
+    end
+
+end
+
+function Abilities.awaitReplication(state: ControlledExecution.Execution, awaitingKey: any?)
+    local now = os.clock()
+    local guid = state._guid :: string
+    local thread = coroutine.running()
+
+    awaitingSuspensions[guid] = thread
+    
+    if awaitingKey then
+        while state.communicated[awaitingKey] == nil do
+            coroutine.yield()
+        end
+
+    else
+        coroutine.yield()
+    end
+
+    awaitingSuspensions[guid] = nil
+    state.skip(os.clock() - now)
+
+end
+
+
+return Abilities
