@@ -45,3 +45,4 @@ jobs:
           file: ../ROBLOX_PLACE_FILE.rbxl
           # Optionally set shouldPublish from a secret or default to true
           shouldPublish: ${{ secrets.SHOULD_PUBLISH || 'true' }}
+
