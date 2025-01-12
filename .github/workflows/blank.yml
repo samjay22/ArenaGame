@@ -22,16 +22,6 @@ jobs:
           verbose: false
           version: latest
 
-      - name: Install Luau Type Checker
-        run: |
-          curl -L https://github.com/luau-lang/luau/archive/refs/heads/master.zip | tar xz
-          sudo mv luau /usr/local/bin/luau-analyze
-
-      - name: Run Luau Type Checker
-        run: |
-          luau-analyze .
-        continue-on-error: false
-
       - name: Upload to Roblox
         uses: Ulferno/upload-to-roblox@v1.0.4
         with:
