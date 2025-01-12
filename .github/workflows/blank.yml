@@ -33,7 +33,7 @@ jobs:
             working-directory: .
             
       - name: Verify Output File
-        run: ls -la
+        run: ls ..
         
       - name: Upload to Roblox
         uses: Ulferno/upload-to-roblox@v1.0.4
