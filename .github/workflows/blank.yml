@@ -1,68 +1,44 @@
-name: Deploy to Roblox
+name: CI/CD Pipeline
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Which environment to deploy to (dev, stage, prod)'
-        required: true
-        default: 'dev'
-
   push:
     branches:
-      - 'Prod'
-      - 'Stage'
-      - 'Dev'
+      - Prod
+      - Stage
+      - Dev
 
 jobs:
-  deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
-
-    # Set the environment based on input or branch name
-    environment: ${{ github.event.inputs.environment || 
-        (github.ref == 'refs/heads/Prod' && 'Prod') || 
-        (github.ref == 'refs/heads/Stage' && 'Stage') || 
-        (github.ref == 'refs/heads/Dev' && 'Dev') || 
-        'Dev' }}
-
+    # Dynamically set the environment based on the branch name
+    environment: ${{ github.ref_name == 'Prod' && 'Production' || github.ref_name == 'Stage' && 'Staging' || github.ref_name == 'Dev' && 'Development' }}
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
 
-    - name: Install Rojo
-      run: |
-        curl -L https://github.com/rojo-rbx/rojo/releases/download/7.3.0/rojo-7.3.0-linux-x86_64.tar.gz | tar xz
-        sudo mv rojo /usr/local/bin/
+      - name: Install Luau
+        uses: EncodedVenom/install-luau@v4.3
+        with:
+          verbose: false
+          version: latest
 
-    - name: Install Luau Type Checker
-      run: |
-        curl -L https://github.com/Roblox/luau/releases/download/0.543/luau-linux.tar.gz | tar xz
-        sudo mv luau /usr/local/bin/luau-analyze
+      - name: Install Luau Type Checker
+        run: |
+          curl -L https://github.com/Roblox/luau/releases/download/0.543/luau-linux.tar.gz | tar xz
+          sudo mv luau /usr/local/bin/luau-analyze
 
-    - name: Run Luau Type Checker
-      run: |
-        luau-analyze .
-      continue-on-error: false
+      - name: Run Luau Type Checker
+        run: |
+          luau-analyze .
+        continue-on-error: false
 
-    - name: Build Roblox Place File
-      run: |
-        rojo build -o place.rbxlx
-
-    - name: Deploy to Roblox
-      env:
-        ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
-        ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_PLACE_ID }}
-      run: |
-        RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
-          -H "x-api-key: $ROBLOX_API_KEY" \
-          -F "file=@place.rbxlx" \
-          "https://apis.roblox.com/universes/v1/places/$ROBLOX_PLACE_ID/versions?versionType=Published")
-
-        if [ "$RESPONSE" -ne 200 ]; then
-          echo "Failed to upload place file"
-          cat response.json
-          exit 1
-        else
-          echo "Place uploaded successfully"
-          cat response.json
-        fi
+      - name: Upload to Roblox
+        uses: Ulferno/upload-to-roblox@v1.0.4
+        with:
+          # Pulling secrets from the environment
+          api-key: ${{ secrets.API_KEY }}
+          universeId: ${{ secrets.UNIVERSE_ID }}
+          placeId: ${{ secrets.PLACE_ID }}
+          file: ${{ secrets.FILE_PATH }}
+          # Optionally set shouldPublish from a secret or default to true
+          shouldPublish: ${{ secrets.SHOULD_PUBLISH || 'true' }}
