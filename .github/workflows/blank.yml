@@ -21,6 +21,17 @@ jobs:
         with:
           verbose: false
           version: latest
+          
+      - name: Rojo Build
+        uses: CompeyDev/rojo-build-action@0.1.5
+        with:
+            # File to write to (excluding file type)
+            output: ../ROBLOX_PLACE_FILE
+            # The type of file to be outputted
+            type: rbxl
+            # Directory to run the build in
+            working-directory: .
+            
 
       - name: Upload to Roblox
         uses: Ulferno/upload-to-roblox@v1.0.4
@@ -29,6 +40,6 @@ jobs:
           api-key: ${{ secrets.API_KEY }}
           universeId: ${{ secrets.UNIVERSE_ID }}
           placeId: ${{ secrets.PLACE_ID }}
-          file: ${{ secrets.FILE_PATH }}
+          file: ../ROBLOX_PLACE_FILE
           # Optionally set shouldPublish from a secret or default to true
           shouldPublish: ${{ secrets.SHOULD_PUBLISH || 'true' }}
