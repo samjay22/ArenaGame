@@ -11,7 +11,7 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     # Dynamically set the environment based on the branch name
-    environment: ${{ github.ref_name == 'Prod' || github.ref_name == 'Stage' || github.ref_name == 'Dev' }}
+    environment: ${{ github.ref_name == 'Prod' && 'Prod' || github.ref_name == 'Stage' && 'Stage' || github.ref_name == 'Dev' && 'Dev' }}
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v3
