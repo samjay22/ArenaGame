@@ -42,6 +42,6 @@ jobs:
           api-key: ${{ secrets.API_KEY }}
           universeId: ${{ secrets.UNIVERSE_ID }}
           placeId: ${{ secrets.PLACE_ID }}
-          file: ../ROBLOX_PLACE_FILE
+          file: ../ROBLOX_PLACE_FILE.rbxl
           # Optionally set shouldPublish from a secret or default to true
           shouldPublish: ${{ secrets.SHOULD_PUBLISH || 'true' }}
