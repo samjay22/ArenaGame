@@ -28,7 +28,7 @@ function Abilities.load(folder: Instance) -- Prob not gonna use this, use define
 end
 
 function Abilities.execute(player: Player, attackName: string, skipTime: number?)
-    local execution = executionCache[attackName]
+    local execution = abilityCache[attackName]
     assert(execution, `No execution for {attackName}`)
 
     local controlledExecution = ControlledExecution.createExecution(coroutine.create(execution))
